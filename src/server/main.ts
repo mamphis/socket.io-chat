@@ -129,17 +129,17 @@ export class Main {
 
             let user = new User(socket.client.id, socket);
             this.userHandler.add(user);
-            socket.emit('logon', this.userHandler.findUserById(user.clientId));
+            socket.emit('logon', user.clientId);
 
             socket.on('disconnect', () => {
                 console.log("Client disconnected: " + socket.client.id);
                 this.userHandler.remove(socket.client.id);
                 this.userHandler.typingUsers = this.userHandler.typingUsers.filter(val => val.id != socket.client.id);
                 this.io.emit('expectUserRefresh', undefined);
-            });
+            }); 
 
             socket.on('requestUsers', () => {
-                socket.emit('responseUsers', this.userHandler.all());
+                socket.emit('responseUsers', this.userHandler.all().map(val => val.name));
             });
 
             socket.on('requestCommands', () => {
