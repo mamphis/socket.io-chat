@@ -29,7 +29,7 @@ var Main = /** @class */ (function () {
             else {
                 text = 'pong';
             }
-            socket.emit('newClientMessage', from, new message_1.Message(text, { class: 'private' }));
+            socket.emit('newClientMessage', from.clientId, from.name, new message_1.Message(text, { class: 'private' }));
         });
         this.cmdHandler.register(['tenor', 'gif'], function (from, text, socket) {
             if (text == '') {
@@ -45,28 +45,28 @@ var Main = /** @class */ (function () {
                     var obj = JSON.parse(data);
                     var gifResult = obj.results[0];
                     if (gifResult) {
-                        _this.io.emit('newClientMessage', from, new message_1.Message('tenor: ' + text, { img: gifResult.media[0].gif.url }));
+                        _this.io.emit('newClientMessage', from.clientId, from.name, new message_1.Message('tenor: ' + text, { img: gifResult.media[0].gif.url }));
                     }
                 });
             });
         });
         this.cmdHandler.register('tts', function (from, text, socket) {
-            _this.io.emit('newClientMessage', from, new message_1.Message(text, { tts: text }));
+            _this.io.emit('newClientMessage', from.clientId, from.name, new message_1.Message(text, { tts: text }));
         });
         this.cmdHandler.register(['private', 'to', 'msg'], function (from, text, socket) {
             var u = text.split(' ')[0];
             var user = _this.userHandler.findUserByName(u);
             var msg = text.substring(u.length + 1);
             if (user) {
-                _this.io.sockets.sockets[user.clientId].emit('newClientMessage', from, new message_1.Message(msg, { class: 'private' }));
-                socket.emit('newClientMessage', from, new message_1.Message('[' + user.name + '] ' + msg, { class: 'private' }));
+                _this.io.sockets.sockets[user.clientId].emit('newClientMessage', from.clientId, from.name, new message_1.Message(msg, { class: 'private' }));
+                socket.emit('newClientMessage', from.clientId, from.name, new message_1.Message('[' + user.name + '] ' + msg, { class: 'private' }));
             }
         });
         this.cmdHandler.register(['tableflip', 'tf'], function (from, text, socket) {
-            _this.io.emit('newClientMessage', from, new message_1.Message(text + '(╯°□°）╯︵ ┻━┻'));
+            _this.io.emit('newClientMessage', from.clientId, from.name, new message_1.Message(text + '(╯°□°）╯︵ ┻━┻'));
         });
         this.cmdHandler.register(['shrug', 'hmm'], function (from, text, socket) {
-            _this.io.emit('newClientMessage', from, new message_1.Message(text + '¯\\_(ツ)_/¯'));
+            _this.io.emit('newClientMessage', from.clientId, from.name, new message_1.Message(text + '¯\\_(ツ)_/¯'));
         });
         this.cmdHandler.register('ip', function (from, text, socket) {
             var info = '';
@@ -76,7 +76,7 @@ var Main = /** @class */ (function () {
             else {
                 info = text + ': ' + _this.userHandler.findUserByName(text).remoteAddr;
             }
-            socket.emit('newClientMessage', from, new message_1.Message(info, { class: 'private' }));
+            socket.emit('newClientMessage', from.clientId, from.name, new message_1.Message(info, { class: 'private' }));
         });
         this.cmdHandler.register('changeUserName', function (from, text, socket) {
             if (text == '') {
@@ -146,7 +146,7 @@ var Main = /** @class */ (function () {
                     _this.cmdHandler.handle(from, msg, socket);
                 }
                 else {
-                    _this.io.emit('newClientMessage', from, msg);
+                    _this.io.emit('newClientMessage', from.clientId, from.name, msg);
                 }
             });
             socket.on('typing', function (fromId, status) {

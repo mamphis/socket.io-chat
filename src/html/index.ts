@@ -17,9 +17,9 @@ let formatDate = (date: Date) => {
     let smin: string = min.toString();
     let shour: string = hour.toString();
 
-    if (sec < 10) { ssec = '0' + sec };
-    if (min < 10) { smin = '0' + min };
-    if (hour < 10) { shour = '0' + hour };
+    if (sec < 10) { ssec = '0' + sec }
+    if (min < 10) { smin = '0' + min }
+    if (hour < 10) { shour = '0' + hour }
 
     return `${shour}:${smin}:${ssec}`;
 }
@@ -80,7 +80,7 @@ $(document).ready(() => {
         $('#chat_text_input').autocomplete({
             source: commands,
             minLength: 1,
-            position: { my: 'top bottom', at: 'top left' },
+            position: { my: 'top bottom', at: 'top left' }
         });
     });
 
