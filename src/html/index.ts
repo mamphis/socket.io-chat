@@ -1,17 +1,17 @@
 ///<reference path="../../node_modules/@types/jquery/index.d.ts"/>
+///<reference path="../../node_modules/@types/jqueryui/index.d.ts"/>
 ///<reference path="../../node_modules/@types/socket.io-client/index.d.ts"/>
 ///<reference path="../server/model/user"/>
 
-import { User } from "../server/model/user";
-
-let socket:SocketIOClient.Socket;
-let myUser;
+let socket: SocketIOClient.Socket;
+let myUserId: string;
+let myUserName: string;
 let synth = window.speechSynthesis;
 
-let formatDate = (date:Date) => {
-    let sec:number = date.getSeconds();
-    let min:number = date.getMinutes();
-    let hour:number = date.getHours();
+let formatDate = (date: Date) => {
+    let sec: number = date.getSeconds();
+    let min: number = date.getMinutes();
+    let hour: number = date.getHours();
 
     let ssec: string = sec.toString();
     let smin: string = min.toString();
@@ -27,27 +27,27 @@ let formatDate = (date:Date) => {
 $(document).ready(() => {
     socket = io();
 
-    socket.on('logon', (user:User) => {
-        myUser = user;
-        setUserName(myUser);
+    socket.on('logon', (userId:string) => {
+        myUserId = userId;
+        setUserName(myUserName);
     });
 
-    socket.on('responseSetClientName', (userName:string) => {
+    socket.on('responseSetClientName', (userName: string) => {
         if (!userName) {
-            setUserName(myUser);
+            setUserName(myUserName);
         }
 
-        myUser.name = userName;
+        myUserName = userName;
         socket.emit('requestUsers');
         socket.emit('requestCommands');
     });
 
-    socket.on('newClientMessage', (from, message) => {
+    socket.on('newClientMessage', (fromId: string, fromName: string, message: any) => {
         if (message.text == '') {
             return;
         }
 
-        let text = $('<li>').text(`[${formatDate(new Date())}] ${from.name}: ${message.text}`).addClass(from.clientId);
+        let text = $('<li>').text(`[${formatDate(new Date())}] ${fromName}: ${message.text}`).addClass(fromId);
         if (message.options) {
             if (message.options.class) {
                 text.addClass(message.options.class);
@@ -67,19 +67,19 @@ $(document).ready(() => {
         window.scrollBy(0, 999999);
     });
 
-    socket.on('responseUsers', (users) => {
+    socket.on('responseUsers', (userNames: string[]) => {
         $('#userList').empty();
-        users.forEach(user => {
-            if (user.name && user.name != '') {
-                $('#userList').append($('<li>').text(user.name));
+        userNames.forEach(userName => {
+            if (userName && userName != '') {
+                $('#userList').append($('<li>').text(userName));
             }
         });
     });
 
-    socket.on('responseCommands', (commands) => {
+    socket.on('responseCommands', (commands: string[]) => {
         $('#chat_text_input').autocomplete({
             source: commands,
-            minlength: 1,
+            minLength: 1,
             position: { my: 'top bottom', at: 'top left' },
         });
     });
@@ -88,7 +88,7 @@ $(document).ready(() => {
         socket.emit('requestUsers');
     });
 
-    socket.on('typing', (users) => {
+    socket.on('typing', (users: string[]) => {
         let typingUsers = users.join(', ');
         if (users.length > 0) {
             $('#typing').text(typingUsers + ' typing...');
@@ -97,9 +97,9 @@ $(document).ready(() => {
         }
     });
 
-    function setUserName(user) {
+    function setUserName(userName: string) {
         let randomNumber = Math.floor(Math.random() * 8999) + 1000;
-        let name = prompt('Please enter your name', user.name == '' ? 'Guest' + randomNumber : user.name);
+        let name = prompt('Please enter your name', userName == '' ? 'Guest' + randomNumber : userName);
         $('#chat_text_input').focus();
         socket.emit('requestSetClientName', name);
     }
@@ -110,9 +110,9 @@ $(document).ready(() => {
 
     function refreshTypingStatus() {
         if (input.val() == '' || new Date().getTime() - lastTypedTime.getTime() > typingDelayMillis) {
-            socket.emit('typing', myUser.clientId, 'ended');
+            socket.emit('typing', myUserId, 'ended');
         } else {
-            socket.emit('typing', myUser.clientId, 'started');
+            socket.emit('typing', myUserId, 'started');
         }
     }
 
@@ -129,7 +129,7 @@ $(document).ready(() => {
         $('#chat_text_input').val('')
 
         if (text && text != '') {
-            socket.emit('clientMessage', myUser.clientId, text);
+            socket.emit('clientMessage', myUserId, text);
         }
 
         // return false to not reload the page

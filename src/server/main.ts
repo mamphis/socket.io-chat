@@ -39,7 +39,7 @@ export class Main {
                 text = 'pong';
             }
 
-            socket.emit('newClientMessage', from, new Message(text, { class: 'private' }));
+            socket.emit('newClientMessage', from.clientId, from.name, new Message(text, { class: 'private' }));
         });
 
         this.cmdHandler.register(['tenor', 'gif'], (from, text, socket) => {
@@ -58,14 +58,14 @@ export class Main {
                     let obj = JSON.parse(data);
                     let gifResult = obj.results[0];
                     if (gifResult) {
-                        this.io.emit('newClientMessage', from, new Message('tenor: ' + text, { img: gifResult.media[0].gif.url }));
+                        this.io.emit('newClientMessage', from.clientId, from.name, new Message('tenor: ' + text, { img: gifResult.media[0].gif.url }));
                     }
                 });
             });
         });
 
         this.cmdHandler.register('tts', (from, text, socket) => {
-            this.io.emit('newClientMessage', from, new Message(text, { tts: text }));
+            this.io.emit('newClientMessage', from.clientId, from.name, new Message(text, { tts: text }));
         });
 
         this.cmdHandler.register(['private', 'to', 'msg'], (from, text, socket) => {
@@ -74,17 +74,17 @@ export class Main {
             let msg = text.substring(u.length + 1);
 
             if (user) {
-                this.io.sockets.sockets[user.clientId].emit('newClientMessage', from, new Message(msg, { class: 'private' }));
-                socket.emit('newClientMessage', from, new Message('[' + user.name + '] ' + msg, { class: 'private' }));
+                this.io.sockets.sockets[user.clientId].emit('newClientMessage', from.clientId, from.name, new Message(msg, { class: 'private' }));
+                socket.emit('newClientMessage', from.clientId, from.name, new Message('[' + user.name + '] ' + msg, { class: 'private' }));
             }
         });
 
         this.cmdHandler.register(['tableflip', 'tf'], (from, text, socket) => {
-            this.io.emit('newClientMessage', from, new Message(text + '(╯°□°）╯︵ ┻━┻'));
+            this.io.emit('newClientMessage', from.clientId, from.name, new Message(text + '(╯°□°）╯︵ ┻━┻'));
         });
 
         this.cmdHandler.register(['shrug', 'hmm'], (from, text, socket) => {
-            this.io.emit('newClientMessage', from, new Message(text + '¯\\_(ツ)_/¯'));
+            this.io.emit('newClientMessage', from.clientId, from.name, new Message(text + '¯\\_(ツ)_/¯'));
         });
 
         this.cmdHandler.register('ip', (from, text, socket) => {
@@ -95,7 +95,7 @@ export class Main {
                 info = text + ': ' + this.userHandler.findUserByName(text).remoteAddr;
             }
 
-            socket.emit('newClientMessage', from, new Message(info, { class: 'private' }));
+            socket.emit('newClientMessage', from.clientId, from.name, new Message(info, { class: 'private' }));
         });
 
         this.cmdHandler.register('changeUserName', (from, text, socket) => {
@@ -174,7 +174,7 @@ export class Main {
                 if (msg.text.indexOf(this.cmdHandler.COMMAND_PREFIX) == 0) {
                     this.cmdHandler.handle(from, msg, socket);
                 } else {
-                    this.io.emit('newClientMessage', from, msg);
+                    this.io.emit('newClientMessage', from.clientId, from.name, msg);
                 }
             });
 
