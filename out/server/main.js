@@ -106,7 +106,7 @@ var Main = /** @class */ (function () {
             console.log('New client connected: ' + socket.client.id);
             var user = new user_1.User(socket.client.id, socket);
             _this.userHandler.add(user);
-            socket.emit('logon', _this.userHandler.findUserById(user.clientId));
+            socket.emit('logon', user.clientId);
             socket.on('disconnect', function () {
                 console.log("Client disconnected: " + socket.client.id);
                 _this.userHandler.remove(socket.client.id);
@@ -114,7 +114,7 @@ var Main = /** @class */ (function () {
                 _this.io.emit('expectUserRefresh', undefined);
             });
             socket.on('requestUsers', function () {
-                socket.emit('responseUsers', _this.userHandler.all());
+                socket.emit('responseUsers', _this.userHandler.all().map(function (val) { return val.name; }));
             });
             socket.on('requestCommands', function () {
                 socket.emit('responseCommands', _this.cmdHandler.availableCommands());
