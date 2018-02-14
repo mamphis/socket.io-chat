@@ -6,6 +6,7 @@ var User = /** @class */ (function () {
         this._name = '';
         this._socket = socket;
         this._remoteAddress = socket.conn.remoteAddress;
+        this._currentRoom = 'room1';
     }
     Object.defineProperty(User.prototype, "name", {
         get: function () {
@@ -27,6 +28,16 @@ var User = /** @class */ (function () {
     Object.defineProperty(User.prototype, "remoteAddress", {
         get: function () {
             return this._remoteAddress;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(User.prototype, "currentRoom", {
+        get: function () {
+            return this._currentRoom;
+        },
+        set: function (value) {
+            this._currentRoom = value;
         },
         enumerable: true,
         configurable: true

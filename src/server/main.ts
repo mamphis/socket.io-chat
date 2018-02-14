@@ -145,7 +145,7 @@ export class Main {
             socket.on('requestCommands', () => {
                 socket.emit('responseCommands', this.cmdHandler.availableCommands());
             });
-
+            
             socket.on('requestSetClientName', (name: string) => {
                 let response: string | undefined;
                 if (this.userHandler.all().some(val => val.name == name && val.clientId != socket.client.id)) {

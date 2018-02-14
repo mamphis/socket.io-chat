@@ -27,7 +27,7 @@ let formatDate = (date: Date) => {
 $(document).ready(() => {
     socket = io();
 
-    socket.on('logon', (userId:string) => {
+    socket.on('logon', (userId: string) => {
         myUserId = userId;
         setUserName(myUserName);
     });
@@ -134,5 +134,10 @@ $(document).ready(() => {
 
         // return false to not reload the page
         return false;
+    });
+
+    $('.room').click((e: any) => {
+        let event = <MouseEvent>e;
+        console.log((<HTMLLinkElement>event.currentTarget).id);
     });
 });

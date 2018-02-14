@@ -118,4 +118,8 @@ $(document).ready(function () {
         // return false to not reload the page
         return false;
     });
+    $('.room').click(function (e) {
+        var event = e;
+        console.log(event.currentTarget.id);
+    });
 });
